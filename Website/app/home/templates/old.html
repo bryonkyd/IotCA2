@@ -1,0 +1,91 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.js"></script>
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main class="content">
+        <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+            <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+        </div>
+
+	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+            <div class="d-block mb-4 mb-md-0">
+                <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                    <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                        <li class="breadcrumb-item"><a href="index.html"><span class="fas fa-home"></span></a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Old Data</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+	<div class="card border-light shadow-sm mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-centered table-nowrap mb-0 rounded">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="border-0">ID</th>
+                                <th class="border-0">Date & Time</th>
+                                <th class="border-0">Gas</th>
+                                <th class="border-0">Temperature</th>
+                                <th class="border-0">Humidity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sensor-table">
+                            <!-- Item -->
+                            <!-- End of Item -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        {% include 'includes/footer.html' %}
+
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.js"></script>
+<script >
+	sensordata = null
+	getNewData()
+	function getNewData() {
+	        jQuery.ajax({
+	            url: "/api/getolddata",
+	            type: 'POST',
+	            success: function(ndata, textStatus, xhr) {
+	                //console.log(ndata.sensor_data.data)
+	                sensordata = ndata.sensor_data.data
+			updateTable(sensordata)
+	            } //end success
+        	}); //end ajax
+		
+	}
+	
+	function updateTable(sensordata) {
+		console.log(sensordata)
+		var rows = "";
+		for (i in sensordata) {
+			//console.log(i);
+			var row = "<tr>";
+			row += "<td>"+sensordata[i].id+"</td>";
+			row += "<td>"+sensordata[i].datetime_value+"</td>";
+			row += "<td>"+sensordata[i].gas_levels+"</td>";
+			row += "<td>"+sensordata[i].temperature+"</td>";
+			row += "<td>"+sensordata[i].humidity+"</td></tr>";
+			rows += row;
+		}
+		$("#sensor-table").html(rows)
+	}
+
+</script>
+{% endblock javascripts %}

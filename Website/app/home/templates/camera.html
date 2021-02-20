@@ -1,0 +1,230 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Camera {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+    #playerContainer,
+    .player {
+        width: 100%;
+        height: auto;
+        min-height: 400px;
+        background-color: black;
+        outline: none;
+    }
+    .vjs-big-play-button {
+        display: none !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+          
+    <main class="content" onload=startStream()>
+	<div class="preloader bg-soft flex-column justify-content-center align-items-center">
+            <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+            <div class="d-block mb-4 mb-md-0">
+                <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                    <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                        <li class="breadcrumb-item"><a href="index.html"><span class="fas fa-home"></span></a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Camera</li>
+                    </ol>
+                </nav>
+                <h2 class="h4">Pi Camera Module</h2>
+                <p class="mb-0">See what the camera sees.</p>
+            </div>
+        </div>
+
+     
+        <div class="row justify-content-md-center">
+            <div class="pump-status col-12">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <div id="playerContainer">
+                            <!-- HLS.js elements -->
+                            <video id="hlsjs" class="player" controls autoplay></video>
+                            <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-md-center">
+            <div class="col-sm-12">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="up" class="btn btn-primary pump-button">Up</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="left" class="btn btn-primary pump-button">Left</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="center" class="btn btn-primary pump-button">Center</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="right" class="btn btn-primary pump-button">Right</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+            <button id="down" class="btn btn-primary pump-button">Down</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+	
+        {% include 'includes/footer.html' %}
+
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.490.0/aws-sdk.min.js"></script>
+<script>
+    function startStream() {
+        var protocol = "HLS";
+        var streamName = "test";
+        // Step 1: Configure SDK Clients
+        var options = {
+            //Change Keys here
+            accessKeyId: "{{ akey }}",
+            secretAccessKey: "{{ skey }}",
+            sessionToken: "{{ stoken }}" || undefined,
+            region: "us-east-1",
+        }
+        var kinesisVideo = new AWS.KinesisVideo(options);
+        var kinesisVideoArchivedContent = new AWS.KinesisVideoArchivedMedia(options);
+
+        // Step 2: Get a data endpoint for the stream
+        console.log('Fetching data endpoint');
+        kinesisVideo.getDataEndpoint({
+            StreamName: streamName,
+            APIName: protocol === 'DASH' ? "GET_DASH_STREAMING_SESSION_URL" : "GET_HLS_STREAMING_SESSION_URL"
+        }, function(err, response) {
+            if (err) { return console.error(err); }
+            console.log('Data endpoint: ' + response.DataEndpoint);
+            kinesisVideoArchivedContent.endpoint = new AWS.Endpoint(response.DataEndpoint);
+
+            // Step 3: Get a Streaming Session URL
+            var consoleInfo = 'Fetching ' + protocol + ' Streaming Session URL';
+            console.log(consoleInfo);
+            kinesisVideoArchivedContent.getHLSStreamingSessionURL({
+                StreamName: "test",
+                PlaybackMode: "LIVE",
+                HLSFragmentSelector: {
+                    FragmentSelectorType: "SERVER_TIMESTAMP",
+                },
+                ContainerFormat: "FRAGMENTED_MP4",
+                DiscontinuityMode: "ALWAYS",
+                DisplayFragmentTimestamp: "NEVER"
+            }, function(err, response) {
+                if (err) { return console.error(err); }
+                console.log('HLS Streaming Session URL: ' + response.HLSStreamingSessionURL);
+                // Step 4: Give the URL to the video player.
+                var playerElement = $('#hlsjs');
+                playerElement.show();
+                var player = new Hls();
+                console.log('Created HLS.js Player');
+                player.loadSource(response.HLSStreamingSessionURL);
+                player.attachMedia(playerElement[0]);
+                console.log('Set player source');
+                player.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                    console.log('Starting playback');
+                });
+            });
+        });
+    };
+</script>  
+<script>
+    $(document).ready(function() {
+      startStream();
+    });
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script>
+
+    function turnUp(){
+      $.ajax({url: "/streamServo/Up",
+              success: function(result){
+                            console.log("Up")
+                            }
+            })
+    }
+    function turnLeft(){
+      $.ajax({url: "/streamServo/Left",
+              success: function(result){
+                            console.log("Left")
+                            }
+            })
+    }
+    function turnCenter(){
+      $.ajax({url: "/streamServo/Center",
+              success: function(result){
+                            console.log("Center")
+                            }
+            })
+    }
+    function turnRight(){
+      $.ajax({url: "/streamServo/Right",
+              success: function(result){
+                            console.log("Right")
+                            }
+            })
+    }
+    function turnDown(){
+      $.ajax({url: "/streamServo/Down",
+              success: function(result){
+                            console.log("Down")
+                            }
+            })
+    }
+
+
+   
+    $(document).ready(function(){
+        $("#up").click(function(){	
+               turnUp();
+        });
+        $("#left").click(function(){
+               turnLeft();
+        });
+        $("#center").click(function(){	
+               turnCenter();
+        });
+        $("#right").click(function(){		
+               turnRight();
+        });
+        $("#down").click(function(){	
+               turnDown();
+        });
+        
+
+
+   });
+
+</script>
+{% endblock javascripts %}

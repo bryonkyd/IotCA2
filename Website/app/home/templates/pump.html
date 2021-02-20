@@ -1,0 +1,155 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Feeder {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+                
+    <main class="content">
+	<div class="preloader bg-soft flex-column justify-content-center align-items-center">
+            <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+            <div class="d-block mb-4 mb-md-0">
+                <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                    <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                        <li class="breadcrumb-item"><a href="index.html"><span class="fas fa-home"></span></a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Feeder</li>
+                    </ol>
+                </nav>
+                <h2 class="h4">Feeder</h2>
+                <p class="mb-0">Release water and food from here.</p>
+            </div>
+        </div>
+
+     
+        <div class="row justify-content-md-center">
+            <div class="col-sm-12">
+                <h3>Water Controls</h3>
+            </div>
+            <div class="col-sm-6">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="b1" class="btn btn-primary pump-button">Turn on</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="b2" class="btn btn-primary pump-button">Turn off</button>
+                    </div>
+                </div>
+            </div>
+            <div class="pump-status col-12">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2>Status:</h2>
+                        <span id="pump-status">The Pump is Off</span
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-md-center">
+            <div class="col-sm-12">
+                <h3>Food Controls</h3>
+            </div>
+            <div class="col-sm-6">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="b3" class="btn btn-primary pump-button">Turn on</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+			<button id="b4" class="btn btn-primary pump-button">Turn off</button>
+                    </div>
+                </div>
+            </div>
+            <div class="pump-status col-12">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2>Status:</h2>
+                        <span id="servo-status">The Servo is Off</span
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	
+        {% include 'includes/footer.html' %}
+
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script>
+
+          function turnPumpOn(){
+            $.ajax({url: "writePump/On",
+                    success: function(result){
+                                  $("#pump-status").html(result);
+                                  }
+                  })
+          }
+          
+          
+          function turnPumpOff(){
+            $.ajax({url: "writePump/Off",
+                    success: function(result){
+                                  $("#pump-status").html(result);
+                                  }
+            })
+          }
+
+
+          function turnServoOn(){
+            $.ajax({url: "writeServo/On",
+                    success: function(result){
+                                  $("#servo-status").html(result);
+                                  }
+                  })
+          }
+          
+          
+          function turnServoOff(){
+            $.ajax({url: "writeServo/Off",
+                    success: function(result){
+                                  $("#servo-status").html(result);
+                                  }
+            })
+          }
+
+         
+          $(document).ready(function(){
+              $("#b1").click(function(){
+                     console.log("water on");		
+                     turnPumpOn();
+              });
+              $("#b2").click(function(){
+                     console.log("water off");
+                     turnPumpOff();
+              });
+              $("#b3").click(function(){
+                     console.log("food on");		
+                     turnServoOn();
+              });
+              $("#b4").click(function(){
+                     console.log("food off");
+                     turnServoOff();
+              });
+
+
+         });
+
+</script>
+{% endblock javascripts %}
