@@ -1,6 +1,8 @@
 # Home Pet Feeder
 IotCA2 Repo for Dextor and Bryon. Team DB
 
+![alt text](https://github.com/Zerolegacy/IotCA2]/blob/main/picture1.png?raw=true)
+
 Quick Start Guide:
 
 1)	First connect hardware as in Section 2 of the step by step tutorial
