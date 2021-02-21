@@ -137,19 +137,6 @@ def apidata_getdata():
             print(sys.exc_info()[1])
             return None
 
-@blueprint.route("/api/getolddata",methods = ['POST', 'GET'])
-def apidata_getolddata():
-    if request.method == 'POST':
-        try:
-            data = {'chart_data': data_to_json(get_data_from_dynamodb(50)), 
-             'title': "IOT Old Data"}
-            print(data)
-            return jsonify(data)
-        except:
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            return None
-
 @blueprint.route("/writePump/<status>")
 def checkPump(status):
 	out = ""
