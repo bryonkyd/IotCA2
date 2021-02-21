@@ -5,8 +5,8 @@ IotCA2 Repo for Dextor and Bryon. Team DB
 
 Quick Start Guide:
 
-1)	First connect hardware as in Section 2
-2)	Install all dependencies as in Section 3
+1)	First connect hardware as in Section 2 of the step by step tutorial.
+2)	Install all dependencies as in Section 3 of the step by step tutorial.
 3)	For Alexa and Live Stream, one of the RaspberryPis has to be Version 10 and the appropriate setting up is required.
 4)	Git clone https://github.com/Zerolegacy/IotCA2
 5)	Transfer the website folder to your ec2 instance
