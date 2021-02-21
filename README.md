@@ -20,10 +20,14 @@ Quick Start Guide:
 13)	Run python3 store_sens.py to start getting values from the sensors to the pi.
 14)	Run python checkbowl.py to start monitor if the foodbowl is empty.
 15)	Run python pubsub.py to start listening to topics with MQTT for actuator commands.
-16)	In the other RaspberryPi (Version 10), run the following command for livestream to start:
+16)	Install Amazon Kinesis following https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp
+17)	Create a credential file with the format “CREDENTIALS <aws_access_key> <session to end> <aws_secret_access_key> <aws_session_token>”
+18)	In the other RaspberryPi (Version 10), run the following command for livestream to start:
 
-gst-launch-1/0 v412src do-timestamp=TRUE device=/dev/video0 ! videoconvert ! video/x-raw,format=I420,width=640,height=480,framerate=30/1 ! omxh264enc control-rate=1 target-bitrate=5120000 periodicity-idr=45 inline-header=FALSE ! h264parse ! Video/x-h264,stream-format=avc,alignment=au,width=640,height=480,framerate=30/1,profile=baseline ! Kvssink stream-name=”iot-video” credential-path=”<credentials file path from step 3>” aws-region=”us-east-1
+gst-launch-1/0 v412src do-timestamp=TRUE device=/dev/video0 ! videoconvert ! video/x-raw,format=I420,width=640,height=480,framerate=30/1 ! omxh264enc control-rate=1 target-bitrate=5120000 periodicity-idr=45 inline-header=FALSE ! h264parse ! Video/x-h264,stream-format=avc,alignment=au,width=640,height=480,framerate=30/1,profile=baseline ! Kvssink stream-name=”<stream name>” credential-path=”<credentials file path from step 16>” aws-region=”us-east-1
 
-17)	In the other RaspberryPi (Version 10), run the following command for Alexa to start:
+19)	Integrate Alexa using the docummentations from the following: https://developer.amazon.com/en-US/docs/alexa/avs-device-sdk/raspberry-pi.html
+20)	In the other RaspberryPi (Version 10), run the following command for Alexa to start:
 
 cd /home/pi/sdk-folder/sdk-build PA_ALSA_PLUGHW=1 ./SampleApp/src/SampleApp ./Integration/AlexaClientSDKConfig.json ../third-party/alexa-rpi/models
+
