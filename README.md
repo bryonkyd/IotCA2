@@ -1,7 +1,7 @@
 # Home Pet Feeder
 IotCA2 Repo for Dextor and Bryon. Team DB
 
-![alt text](https://github.com/Zerolegacy/IotCA2]/blob/main/Picture1.png?raw=true)
+![alt text](https://github.com/Zerolegacy/IotCA2/blob/main/Picture1.png?raw=true)
 
 Quick Start Guide:
 
